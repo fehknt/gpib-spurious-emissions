@@ -1,0 +1,7 @@
+# requirements.txt
+pyvisa
+numpy
+pytest
+pytest-mock
+pyvisa-sim
+matplotlib
