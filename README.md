@@ -19,3 +19,17 @@ The program will use linear interpolation, so if you just enter one value it wil
 However, if you have characterized your attenuator flatness across data points near frequencies of interest, it will be a somewhat more accurate measurement.
 
 The output file contains both the measured power, compensation factor used, and the corrected power, so if you made a mistake in the compensation factors you don't have to remeasure everything.
+
+### Compensation File Generator
+
+A program, `generate_compensation.py`, is included to help generate or update the `ext_att_compensation.csv` file. This is useful for characterizing the loss of cables, attenuators, or antennas.
+
+To use `generate_compensation.py`:
+1. Connect the output of the spectrum analyzer's tracking generator to its input (or through the device/system you want to characterize).
+2. Run the script: `python generate_compensation.py`
+3. Enter the start and end frequencies for the range you want to measure.
+4. The script will then perform one or more sweeps to cover the requested frequency range.
+    * If the requested frequency range has an end frequency more than 10 times the start frequency, the script will automatically break the measurement into multiple segments.
+    * For each sweep, the script captures 401 data points.
+5. The measured attenuation values are saved to `ext_att_compensation.csv`.
+6. If the file already exists, the script will intelligently update it, removing any old data points that are within a 10% frequency tolerance of new measurements to prevent duplicates.
