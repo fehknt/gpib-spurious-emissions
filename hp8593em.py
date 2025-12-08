@@ -151,5 +151,18 @@ class HP8593EM:
             return []
         
         raw_signals = self._fetch_signal_data(num_signals)
-        peaks = analysis.parse_peak_data(raw_signals)
+        peaks = self._parse_peak_data(raw_signals)
+        return peaks
+
+    def _parse_peak_data(self, raw_signals):
+        """Parses raw signal strings into a list of (frequency, power) tuples."""
+        peaks = []
+        for signal_str in raw_signals.values():
+            try:
+                parts = signal_str.strip().split(',')
+                freq_mhz = float(parts[1])
+                amp_dbm = float(parts[2])
+                peaks.append((freq_mhz * 1e6, amp_dbm))
+            except (ValueError, IndexError):
+                print(f"Warning: Could not parse peak data point: '{signal_str}'")
         return peaks
