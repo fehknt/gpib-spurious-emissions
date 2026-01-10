@@ -2,6 +2,7 @@ from hp8593em import HP8593EM
 import pyvisa as visa
 import time
 import analysis
+from visa_utils import discover_and_connect
 
 COMPENSATION_FILE = 'ext_att_compensation.csv'
 
@@ -43,14 +44,17 @@ def print_peak_report(carrier_peaks, spurious_peaks, comp_freqs, comp_dbs):
     if not spurious_peaks and carrier_peaks:
         print("\nNo significant spurious emissions found.")
 
+
+
 def main():
     """Main execution function."""
     comp_freqs, comp_dbs = analysis.load_compensation_file(COMPENSATION_FILE)
-    GPIB_ADDRESS = "GPIB0::18::INSTR"
     sa = None
 
     try:
-        sa = HP8593EM(GPIB_ADDRESS)
+        device_map = {'8593EM': HP8593EM}
+        found_devices = discover_and_connect(device_map)
+        sa = found_devices['8593EM']
         print(f"Connected to: {sa.get_id()}")
         sa.reset()
 
@@ -76,7 +80,7 @@ def main():
         note = input("Enter a note for this measurement: ")
         analysis.append_peaks_to_csv(carrier_peaks, spurious_peaks, comp_freqs, comp_dbs, note)
 
-    except visa.errors.VisaIOError as e:
+    except (visa.errors.VisaIOError, ConnectionError) as e:
         print(f"Error communicating with instrument: {e}")
     except Exception as e:
         print(f"An error occurred: {e}")

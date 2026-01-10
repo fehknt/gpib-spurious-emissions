@@ -2,10 +2,20 @@ import pyvisa as visa
 import time
 
 class HP8593EM:
-    def __init__(self, address):
-        self.rm = visa.ResourceManager()
-        self.instrument = self.rm.open_resource(address)
+    def __init__(self, resource_or_address):
+        if isinstance(resource_or_address, str):
+            rm = visa.ResourceManager()
+            self.instrument = rm.open_resource(resource_or_address)
+        else:
+            self.instrument = resource_or_address
+        
         self.instrument.timeout = 10000
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
 
     def write(self, command):
         print(f"GPIB WRITE: {command}")
